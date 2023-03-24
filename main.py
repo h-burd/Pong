@@ -1,8 +1,13 @@
 import pygame
 from pygame.locals import *
+import random
+
+pygame.init()
 
 clock = pygame.time.Clock()
 vec = pygame.math.Vector2
+font = pygame.font.Font('freesansbold.ttf', 25)
+
 
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 400
@@ -20,34 +25,36 @@ class Paddle(pygame.sprite.Sprite):
         self.surf.fill(colList[-1])
         self.rect = self.surf.get_rect()
         self.side = player_side
+        self.score = 0
         if(self.side == 'right'):
         	self.rect.x = SCREEN_WIDTH - 15
         else:
             self.rect.x = 5
-        # self.surf_center = ((SCREEN_WIDTH - self.surf.get_width())/2, (SCREEN_HEIGHT - self.surf.get_height())/2)
 
     def keys_move(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_DOWN] and self.side == 'right':
-            self.rect.y += 5
+            self.rect.y += 7
         if keys[pygame.K_UP] and self.side == 'right':
-            self.rect.y -= 5
+            self.rect.y -= 7
         if keys[pygame.K_s] and self.side == 'left':
-            self.rect.y += 5
+            self.rect.y += 7
         if keys[pygame.K_w] and self.side == 'left':
-            self.rect.y -= 5
+            self.rect.y -= 7
 
-class Player(pygame.sprite.Sprite):
+    def point_score(self):
+        self.score += 1
+
+class Ball(pygame.sprite.Sprite):
     def __init__(self):
-        super(Player, self).__init__()
-        self.surf = pygame.Surface((SCREEN_WIDTH/20, SCREEN_HEIGHT/20))
+        super(Ball, self).__init__()
+        self.surf = pygame.Surface((SCREEN_WIDTH/25, SCREEN_HEIGHT/25))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
+        self.rect.x = 200
+        self.rect.y = 200
         self.surf_center = ((SCREEN_WIDTH - self.surf.get_width())/2, (SCREEN_HEIGHT - self.surf.get_height())/2)
-        self.vel = vec(3.56, 4.33)
-        self.colList = [(249,38,114), (61,209,119), (255,201,0),(174, 129, 255), (255,63,128), (0,176,255), (254,254,254)]
-        self.i = 0
-        self.count = 0
+        self.vel = vec(0, 0)
 
     def update(self):
         self.rect.x += self.vel.x
@@ -57,46 +64,37 @@ class Player(pygame.sprite.Sprite):
     def keep_on_screen(self):
         if self.rect.left < 0:
             self.rect.left = 0
-            self.change_vel()
+            P2.point_score()
+            self.rect.x = 200
+            self.rect.y = 200
             self.vel.x = self.vel.x * - 1
         if self.rect.right > SCREEN_WIDTH:
             self.rect.right = SCREEN_WIDTH
-            self.change_vel()
+            P1.point_score()
+            self.rect.x = 200
+            self.rect.y = 200
             self.vel.x = self.vel.x * - 1
         if self.rect.top <= 0:
             self.rect.top = 0
-            self.change_vel()
             self.vel.y = self.vel.y * - 1
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
-            self.change_vel()
             self.vel.y = self.vel.y * - 1
-            
-
-    def change_vel(self):
-        if self.i < len(self.colList):
-            col = self.colList[self.i]
-            self.i += 1
-        else:
-            self.i = 0
-            col = self.colList[self.i]
-        self.surf.fill(col)
-        self.vel.y = self.vel.y * 1.01
-        self.vel.x = self.vel.x * 1.01
-        self.count += 1
 
 
-ball = Player()
+
+ball = Ball()
 P1 = Paddle('right')
 P2 = Paddle('left')
 
-ball.vel.x = -2
-ball.vel.y = 4
+ball.vel.x = -3
+ball.vel.y = 5
+
+
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(P1)
 all_sprites.add(P2)
-
 all_sprites.add(ball)
 
 
@@ -110,22 +108,19 @@ while running:
 
     P1.keys_move()
     P2.keys_move()
-
     ball.update()
 
-    
 
-
-    # print(pygame.key.get_pressed())
-    # print(K_RIGHT)
     for sprite in all_sprites:
         screen.blit(sprite.surf, sprite.rect)
 
     # for sprite in all_sprites:
     # 	screen.blit(sprite.surf, sprite.rect)
 
-    # text = font.render(str(P1.count), True, P1.colList[-1])
-    # screen.blit(text, (SCREEN_WIDTH/2, SCREEN_HEIGHT * 0.05))
+    P1Score = font.render(str(P1.score), True, colList[-1])
+    P2Score = font.render(str(P2.score), True, colList[-1])
+    screen.blit(P1Score, (SCREEN_WIDTH/3, SCREEN_HEIGHT * 0.05))
+    screen.blit(P2Score, (SCREEN_WIDTH * 2/ 3, SCREEN_HEIGHT * 0.05))
 
     pygame.display.flip()
     
