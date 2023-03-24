@@ -31,7 +31,7 @@ class Paddle(pygame.sprite.Sprite):
         else:
             self.rect.x = 5
 
-    def keys_move(self):
+    def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_DOWN] and self.side == 'right':
             self.rect.y += 7
@@ -54,13 +54,14 @@ class Ball(pygame.sprite.Sprite):
         self.rect.x = 200
         self.rect.y = 200
         self.surf_center = ((SCREEN_WIDTH - self.surf.get_width())/2, (SCREEN_HEIGHT - self.surf.get_height())/2)
-        self.vel = vec(0, 0)
+        self.vel = vec(5, random.randrange(-5,5))
 
     def update(self):
         self.rect.x += self.vel.x
         self.rect.y += self.vel.y
+        self.bounce()
         self.keep_on_screen()
-
+        
     def keep_on_screen(self):
         if self.rect.left < 0:
             self.rect.left = 0
@@ -80,6 +81,13 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
             self.vel.y = self.vel.y * - 1
+    
+    def bounce(self):
+        paddleList = [P1.rect, P2.rect]
+        velList = [-5,-4,-3,3,4,5]
+        if(not pygame.Rect.collidelist(self.rect, paddleList) == -1):
+            self.vel.x = self.vel.x * - 1
+            self.vel.y = velList[random.randrange(len(velList))]
 
 
 
@@ -87,15 +95,11 @@ ball = Ball()
 P1 = Paddle('right')
 P2 = Paddle('left')
 
-ball.vel.x = -3
-ball.vel.y = 5
-
-
-
 all_sprites = pygame.sprite.Group()
 all_sprites.add(P1)
 all_sprites.add(P2)
 all_sprites.add(ball)
+
 
 
 running = True
@@ -106,16 +110,14 @@ while running:
             running = False
     screen.fill((46, 42, 46))
 
-    P1.keys_move()
-    P2.keys_move()
+    P1.update()
+    P2.update()
     ball.update()
 
 
     for sprite in all_sprites:
         screen.blit(sprite.surf, sprite.rect)
 
-    # for sprite in all_sprites:
-    # 	screen.blit(sprite.surf, sprite.rect)
 
     P1Score = font.render(str(P1.score), True, colList[-1])
     P2Score = font.render(str(P2.score), True, colList[-1])
@@ -127,6 +129,3 @@ while running:
     clock.tick(30)
 
 pygame.quit()
-
-
-
