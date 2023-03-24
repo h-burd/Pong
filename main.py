@@ -33,13 +33,13 @@ class Paddle(pygame.sprite.Sprite):
 
     def update(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_DOWN] and self.side == 'right':
+        if keys[pygame.K_DOWN] and self.side == 'right' and not self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.y += 7
-        if keys[pygame.K_UP] and self.side == 'right':
+        if keys[pygame.K_UP] and self.side == 'right' and not self.rect.top <= 0:
             self.rect.y -= 7
-        if keys[pygame.K_s] and self.side == 'left':
+        if keys[pygame.K_s] and self.side == 'left' and not self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.y += 7
-        if keys[pygame.K_w] and self.side == 'left':
+        if keys[pygame.K_w] and self.side == 'left' and not self.rect.top <= 0:
             self.rect.y -= 7
 
     def point_score(self):
